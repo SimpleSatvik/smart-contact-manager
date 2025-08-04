@@ -13,7 +13,6 @@ FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
-# Replace 'your-app.jar' with your actual jar name below:
-COPY --from=build /app/target/smarContactManager-0.0.1-SNAPSHOT.jar smarContactManager-0.0.1-SNAPSHOT.jar
+COPY --from=build /app/target/smarContactManager-0.0.1-SNAPSHOT.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
