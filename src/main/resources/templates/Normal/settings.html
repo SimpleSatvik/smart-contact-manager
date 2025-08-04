@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th = "http://www.thymeleaf.org" th:replace = "normal/base::layout(~{::section})">
+<head>
+<meta charset="UTF-8">
+<title>Settings</title>
+</head>
+<body>
+	<section>
+		<div class = "container">
+		
+			<div class = "row">
+			
+			<div class = "col-md-12">
+			
+				<div class = "card">
+				
+					<div class = "card-body">
+					
+						<h3 class = "mb-3">Change Password</h3>
+						
+						<form th:action="@{/user/change-password}" method = "POST">
+						
+					<!-- 	Old Password Field -->
+						<div class = "form-group">
+						
+							<input name = "oldPassword" type = "password" class = "form-control" placeholder = "Enter Old Password">
+						
+						</div>
+						
+					
+					<!-- 	New Password Field -->
+						<div class = "form-group">
+						
+							<input name = "newPassword" type = "password" class = "form-control" placeholder = "Enter New Password">
+						
+						</div>
+						
+						<div class = "container text-center">
+						
+							<button type = "submit" class = "btn btn-success">Change</button>
+						
+						</div>
+						</form>
+					
+					<form th:action="@{/user/change-profile}" method = "POST" enctype="multipart/form-data">
+						
+						<!--  change profile pic -->
+						<h3>Change Profile Picture</h3>
+						<div class = "form-group">
+						
+							<input name = "profilePic" type = "file" class = "form-control" >
+						
+						</div>
+						
+					
+						<div class = "container text-center">
+						
+							<button type = "submit" class = "btn btn-success">Change</button>
+						
+						</div>
+						</form>
+					
+					
+					</div>
+				
+				</div>
+			
+			</div>
+			
+			</div>
+		
+		</div>
+		
+			<script>
+				$(document).ready(() => {
+					$('.item').removeClass('active');
+					$('#setting-link').addClass('active');
+				});
+			</script>
+	</section>
+</body>
+</html>
