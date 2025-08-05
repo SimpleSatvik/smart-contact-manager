@@ -345,48 +345,51 @@ public class userController {
 	
 	//update contact handler
 	@PostMapping("/process-update")
-	public String updateHandler(@ModelAttribute contact Contact, @RequestParam("profileImage") MultipartFile file, Model model, HttpSession session, Principal p)
-	{
-		System.out.println("Contact Id : " + Contact.getcId());
-		System.out.println("Contact Name : " + Contact.getName());
-		
-		try
-		{
-			//fetching old contact detail
-			contact oldContact = Cr.findById(Contact.getcId()).get();
-			
-			//image...
-			if(!file.isEmpty())
-			{
-				//file re write
-				
-				//delete old photo
-				//File can point to both a Folder and a File.
-				File deleteFile = new ClassPathResource("static/img").getFile();
-				File file1 = new File(deleteFile, oldContact.getImage());
-				file1.delete();
-				//update new photo
-				File saveFile = new ClassPathResource("static/img").getFile();
-				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
-				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING); 
-				Contact.setImage(file.getOriginalFilename());
-				
-			}
-			else
-			{
-				Contact.setImage(oldContact.getImage());
-				
-			}
-			User User = Ur.getUserByUserName(p.getName());
-			Contact.setUser(User);
-			Cr.save(Contact);
-		}
-		catch(Exception e)
-		{
-			
-		}
-		return "redirect:/user/" + Contact.getcId() + "/contact";
-	}
+public String updateHandler(@ModelAttribute contact contact, 
+                            @RequestParam("profileImage") MultipartFile file, 
+                            Model model, 
+                            HttpSession session, 
+                            Principal principal) {
+    
+    System.out.println("Contact Id : " + contact.getcId());
+    System.out.println("Contact Name : " + contact.getName());
+
+    try {
+        // Fetch old contact detail
+        contact oldContact = Cr.findById(contact.getcId()).get();
+
+        // If new image uploaded
+        if (!file.isEmpty()) {
+            // ==== Delete old photo from uploads/ folder ====
+            File uploadDir = new File("uploads");
+            File oldFile = new File(uploadDir, oldContact.getImage());
+
+            if (oldFile.exists()) {
+                oldFile.delete();  // Delete old image file
+            }
+
+            // ==== Save new image ====
+            File newFile = new File(uploadDir, file.getOriginalFilename());
+            file.transferTo(newFile);  // Save the uploaded file
+
+            contact.setImage(file.getOriginalFilename()); // Update image name in DB
+        } else {
+            // No new file uploaded, retain old image
+            contact.setImage(oldContact.getImage());
+        }
+
+        // Save updated contact
+        User user = Ur.getUserByUserName(principal.getName());
+        contact.setUser(user);
+        Cr.save(contact);
+
+    } catch (Exception e) {
+        e.printStackTrace();  // Log the exception
+    }
+
+    return "redirect:/user/" + contact.getcId() + "/contact";
+}
+
 	
 	//Your Profile handler
 	@GetMapping("/profile")
