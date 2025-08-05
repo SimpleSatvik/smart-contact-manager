@@ -101,9 +101,19 @@ public class userController {
 				contact.setImage("default.jpg");
 				// If the file is empty then try our message
 			} else {
+				File saveFile = new File("uploads");
+
+			if (!saveFile.exists()) {
+    				saveFile.mkdirs(); // Create the folder if it doesn't exist
+				}
+
+			Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+			
+			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
 				// upload the file to folder and update the name to contact
-				contact.setImage(file.getOriginalFilename());
-				File saveFile = new ClassPathResource("static/img").getFile();
+				//contact.setImage(file.getOriginalFilename());
+				//File saveFile = new ClassPathResource("static/img").getFile();
 				// Consists of a path
 				// Eg- C:\Users\YourName\your-spring-project\target\classes\static\img
 
@@ -161,7 +171,7 @@ public class userController {
 				 * in production (write logic).
 				 */
 				// getting the path
-				Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
+				//Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
 				System.out.println(path);
 				/*
 				 * This line is building a complete file path where your uploaded image will be
@@ -211,7 +221,7 @@ public class userController {
 				 * /Users/you/yourproject/target/classes/static/img/profilepic.jpg So now you
 				 * can copy the uploaded file to that location using:
 				 */
-				Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+				//Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 				System.out.println("Image is uploaded!");
 			}
 				
