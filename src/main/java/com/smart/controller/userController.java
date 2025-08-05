@@ -238,7 +238,7 @@ public class userController {
 
 		}
 
-		return "normal/add_contact_form";
+		return "Normal/add_contact_form";
 	}
 
 	// show contacts handler
