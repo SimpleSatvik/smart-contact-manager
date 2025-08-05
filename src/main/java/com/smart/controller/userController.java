@@ -434,32 +434,42 @@ public String updateHandler(@ModelAttribute contact contact,
 	}
 	
 	@PostMapping("/change-profile")
-	public String changeProfilePic(@RequestParam("profilePic") MultipartFile profilePic, Model model, Principal p)
-	{
-		String contentType = profilePic.getContentType();
-		if (contentType == null || !contentType.startsWith("image/")) 
-		{
-		    model.addAttribute("message", new Message("Only images are allowed!", "alert-danger"));
-		    return "settings";
-		}
-		
-		User user = Ur.getUserByUserName(p.getName());
-		
-		try
-		{
-			user.setImageUrl(profilePic.getOriginalFilename());
-			File saveFile = new ClassPathResource("static/img").getFile();
-			Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + profilePic.getOriginalFilename());
-			Files.copy(profilePic.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-			
-			Ur.save(user);
-			
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		model.addAttribute("message", new Message("Settings Updated Successfully!", "alert-success"));
-		return "Normal/settings";
-	}
+public String changeProfilePic(@RequestParam("profilePic") MultipartFile profilePic, 
+                               Model model, 
+                               Principal principal) {
+    
+    // Validate file type
+    String contentType = profilePic.getContentType();
+    if (contentType == null || !contentType.startsWith("image/")) {
+        model.addAttribute("message", new Message("Only images are allowed!", "alert-danger"));
+        return "settings";
+    }
+
+    // Fetch user
+    User user = Ur.getUserByUserName(principal.getName());
+
+    try {
+        // Save image in uploads/ directory
+        File uploadDir = new File("uploads");
+        if (!uploadDir.exists()) {
+            uploadDir.mkdir();  // Ensure folder exists
+        }
+
+        File newFile = new File(uploadDir, profilePic.getOriginalFilename());
+        profilePic.transferTo(newFile);  // Save the uploaded file
+
+        // Update image in database
+        user.setImageUrl(profilePic.getOriginalFilename());
+        Ur.save(user);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        model.addAttribute("message", new Message("Something went wrong while uploading!", "alert-danger"));
+        return "Normal/settings";
+    }
+
+    model.addAttribute("message", new Message("Settings Updated Successfully!", "alert-success"));
+    return "Normal/settings";
+}
+
 }
