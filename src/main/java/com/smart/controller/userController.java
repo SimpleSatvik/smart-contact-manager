@@ -102,17 +102,17 @@ public class userController {
 				// If the file is empty then try our message
 			} else {
 				File saveFile = new File("uploads");
-
+				
 			if (!saveFile.exists()) {
     				saveFile.mkdirs(); // Create the folder if it doesn't exist
 				}
-
+			contact.setImage(file.getOriginalFilename());
 			Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
 			
 			Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
 				// upload the file to folder and update the name to contact
-				//contact.setImage(file.getOriginalFilename());
+				
 				//File saveFile = new ClassPathResource("static/img").getFile();
 				// Consists of a path
 				// Eg- C:\Users\YourName\your-spring-project\target\classes\static\img
