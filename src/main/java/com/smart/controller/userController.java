@@ -332,6 +332,17 @@ public class userController {
 	}
 
 	// open update form handler
+	// open update form handler
+	@PostMapping("/update-contact/{cId}")
+	public String updateForm(@PathVariable("cId") int cId, Model model)
+	{
+		Optional <contact> contactOptional = Cr.findById(cId);
+		contact Contact = contactOptional.get();
+		
+		model.addAttribute("Title","Update Contact");
+		model.addAttribute("contact",Contact);
+		return "Normal/update_form";
+	}
 	// update contact handler
 @PostMapping("/process-update")
 public String updateHandler(@ModelAttribute contact contact, 
