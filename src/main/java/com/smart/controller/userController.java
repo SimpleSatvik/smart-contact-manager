@@ -332,25 +332,14 @@ public class userController {
 	}
 
 	// open update form handler
-	@PostMapping("/update-contact/{cId}")
-	public String updateForm(@PathVariable("cId") int cId, Model model)
-	{
-		Optional <contact> contactOptional = Cr.findById(cId);
-		contact Contact = contactOptional.get();
-		
-		model.addAttribute("Title","Update Contact");
-		model.addAttribute("contact",Contact);
-		return "Normal/update_form";
-	}
-	
-	//update contact handler
-	@PostMapping("/process-update")
+	// update contact handler
+@PostMapping("/process-update")
 public String updateHandler(@ModelAttribute contact contact, 
                             @RequestParam("profileImage") MultipartFile file, 
                             Model model, 
                             HttpSession session, 
                             Principal principal) {
-    
+
     System.out.println("Contact Id : " + contact.getcId());
     System.out.println("Contact Name : " + contact.getName());
 
@@ -360,17 +349,19 @@ public String updateHandler(@ModelAttribute contact contact,
 
         // If new image uploaded
         if (!file.isEmpty()) {
+
             // ==== Delete old photo from uploads/ folder ====
             File uploadDir = new File("uploads");
-            File oldFile = new File(uploadDir, oldContact.getImage());
-
-            if (oldFile.exists()) {
-                oldFile.delete();  // Delete old image file
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
             }
 
+            Path oldImagePath = Paths.get(uploadDir.getAbsolutePath() + File.separator + oldContact.getImage());
+            Files.deleteIfExists(oldImagePath);
+
             // ==== Save new image ====
-            File newFile = new File(uploadDir, file.getOriginalFilename());
-            file.transferTo(newFile);  // Save the uploaded file
+            Path newImagePath = Paths.get(uploadDir.getAbsolutePath() + File.separator + file.getOriginalFilename());
+            Files.copy(file.getInputStream(), newImagePath, StandardCopyOption.REPLACE_EXISTING);
 
             contact.setImage(file.getOriginalFilename()); // Update image name in DB
         } else {
