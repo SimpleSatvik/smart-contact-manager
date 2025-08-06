@@ -437,39 +437,46 @@ public String updateHandler(@ModelAttribute contact contact,
 public String changeProfilePic(@RequestParam("profilePic") MultipartFile profilePic, 
                                Model model, 
                                Principal principal) {
-    
+
     // Validate file type
     String contentType = profilePic.getContentType();
     if (contentType == null || !contentType.startsWith("image/")) {
         model.addAttribute("message", new Message("Only images are allowed!", "alert-danger"));
-        return "settings";
+        return "Normal/settings";
     }
 
     // Fetch user
     User user = Ur.getUserByUserName(principal.getName());
 
     try {
-        // Save image in uploads/ directory
-        File uploadDir = new File("uploads");
-        if (!uploadDir.exists()) {
-            uploadDir.mkdir();  // Ensure folder exists
+        // Create uploads folder if it doesn't exist
+        String uploadDir = "uploads";
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
         }
 
-        File newFile = new File(uploadDir, profilePic.getOriginalFilename());
-        profilePic.transferTo(newFile);  // Save the uploaded file
+        // Build full path to save the file
+        String originalFilename = profilePic.getOriginalFilename();
+        Path filePath = uploadPath.resolve(originalFilename);
 
-        // Update image in database
-        user.setImageUrl(profilePic.getOriginalFilename());
+        // Copy file to uploads folder (overwrite if exists)
+        Files.copy(profilePic.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Update user entity and save
+        user.setImageUrl(originalFilename);
         Ur.save(user);
+
+        model.addAttribute("message", new Message("Profile picture updated successfully!", "alert-success"));
 
     } catch (Exception e) {
         e.printStackTrace();
         model.addAttribute("message", new Message("Something went wrong while uploading!", "alert-danger"));
-        return "Normal/settings";
     }
 
-    model.addAttribute("message", new Message("Settings Updated Successfully!", "alert-success"));
     return "Normal/settings";
 }
+
 
 }
