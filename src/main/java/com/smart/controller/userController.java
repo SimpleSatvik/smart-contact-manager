@@ -287,7 +287,7 @@ public class userController {
 		model.addAttribute("Title", "Show Contacts");
 		model.addAttribute("contacts", contacts);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("totalPages", contacts.getTotalPages() - 1);
+		model.addAttribute("totalPages", contacts.getTotalPages());
 		System.out.println(contacts.getTotalPages());
 		// send contact list
 		return "Normal/show_contacts";
