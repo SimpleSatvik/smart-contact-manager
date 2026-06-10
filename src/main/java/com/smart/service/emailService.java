@@ -1,6 +1,5 @@
 package com.smart.service;
 
-import java.io.File;
 import java.util.Properties;
 
 import org.springframework.stereotype.Service;
@@ -10,9 +9,7 @@ import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
 
 @Service
 public class emailService 
@@ -23,7 +20,8 @@ public class emailService
 		//rest of the code
 		boolean flag = false; 
 		
-		String from = "newvalorantacc2134@gmail.com";
+		String from = System.getenv().getOrDefault("MAIL_USERNAME", "newvalorantacc2134@gmail.com");
+		String password = System.getenv().getOrDefault("MAIL_PASSWORD", "aioy okva npqf qqgb");
 		//Variable for gmail host
     	String host = "smtp.gmail.com";
     	
@@ -37,15 +35,14 @@ public class emailService
     	properties.put("mail.smtp.port", 465);
     	properties.put("mail.smtp.ssl.enable", "true");
     	properties.put("mail.smtp.auth", "true");
+    	properties.put("mail.smtp.user", from);
     	
     	//Step 1 : to get the session object
 		Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
 
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				// TODO Auto-generated method stub
-				return new PasswordAuthentication("newvalorantacc2134@gmail.com", "aioy okva npqf qqgb"
-						+ "");
+				return new PasswordAuthentication(from, password);
 			}
     		 
     	});
