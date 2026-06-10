@@ -39,12 +39,12 @@ public class emailService
     	properties.put("mail.smtp.auth", "true");
     	
     	//Step 1 : to get the session object
-    	Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
+		Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
 
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				// TODO Auto-generated method stub
-				return new PasswordAuthentication("contacttmanager@gmail.com", "uclp cxzt bsrl hgiv"
+				return new PasswordAuthentication("newvalorantacc2134@gmail.com", "aioy okva npqf qqgb"
 						+ "");
 			}
     		 

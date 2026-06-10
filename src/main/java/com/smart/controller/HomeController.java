@@ -117,7 +117,7 @@ public class HomeController
 	
 	//verify if an email exists or not
 	@GetMapping("/send-otp")
-	public String sendOTP(HttpSession session)
+	public String sendOTP(HttpSession session, Model model)
 	{
 		User user = (User) session.getAttribute("user");
 		String email = user.getEmail();
@@ -148,8 +148,8 @@ public class HomeController
 			return "verify_user";
 		}
 			
-		
-		session.setAttribute("message", "Check your email id!!");
+		model.addAttribute("user", user);
+		session.setAttribute("message", new Message("Check your email id!!", "alert-danger"));
 		return "signup";
 	}
 	
