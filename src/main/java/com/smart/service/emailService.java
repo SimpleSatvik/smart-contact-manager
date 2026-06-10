@@ -18,7 +18,7 @@ public class emailService
 	@Value("${MAIL_USERNAME:newvalorantacc2134@gmail.com}")
 	private String from;
 
-	@Value("${MAIL_PASSWORD:aioy okva npqf qqgb}")
+	@Value("${MAIL_PASSWORD:aioyokvanpqfqqgb}")
 	private String password;
 	
 	public boolean sendEmail(String subject, String msg, String to)
