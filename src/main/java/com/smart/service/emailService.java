@@ -2,6 +2,7 @@ package com.smart.service;
 
 import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.Message;
@@ -14,14 +15,17 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class emailService 
 {
+	@Value("${MAIL_USERNAME:newvalorantacc2134@gmail.com}")
+	private String from;
+
+	@Value("${MAIL_PASSWORD:aioy okva npqf qqgb}")
+	private String password;
 	
 	public boolean sendEmail(String subject, String msg, String to)
 	{
 		//rest of the code
 		boolean flag = false; 
 		
-		String from = System.getenv().getOrDefault("MAIL_USERNAME", "newvalorantacc2134@gmail.com");
-		String password = System.getenv().getOrDefault("MAIL_PASSWORD", "aioy okva npqf qqgb");
 		//Variable for gmail host
     	String host = "smtp.gmail.com";
     	
