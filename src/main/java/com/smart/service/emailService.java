@@ -23,9 +23,11 @@ public class emailService
 	
 	public boolean sendEmail(String subject, String msg, String to)
 	{
-		//rest of the code
 		boolean flag = false; 
-		
+
+		/* =========================================================
+		   OLD SMTP CODE (Commented out because Render blocks port 587)
+		   =========================================================
 		//Variable for gmail host
     	String host = "smtp.gmail.com";
     	
@@ -34,7 +36,6 @@ public class emailService
     	System.out.println("PROPERTIES : " + properties);
     	
     	//Setting important information to properties object
-    	//Host setting
     	properties.put("mail.smtp.host", host);
     	properties.put("mail.smtp.port", 587);
     	properties.put("mail.smtp.starttls.enable", "true");
@@ -43,64 +44,78 @@ public class emailService
     	
     	//Step 1 : to get the session object
 		Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
-
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(from, password);
 			}
-    		 
     	});
-    	
     	
     	session.setDebug(true);
     	//Step 2 : Compose the msg [text, multimedia]
     	MimeMessage m = new MimeMessage(session);
     	
-    	//from Email	
-    	try
-    	{
+    	try {
     		m.setFrom(from);
-    		
-    		//Adding recipient to message
     		m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-    		
-    		//Adding subject to message
     		m.setSubject(subject);
-    		
-    		//Attachment 
-    		//File path
-    		//String path = "G:\\Previous Downloads\\Gojo.jpg";
-    		
-    		//containts text and file
-    		//MimeMultipart multiPart =  new MimeMultipart();
-    		
-    		//MimeBodyPart textMime = new MimeBodyPart();
-    		//MimeBodyPart fileMime = new MimeBodyPart();
-    		
     		m.setContent(msg, "text/html");
     		
-    		//textMime.setText(msg);
-    		//textMime.setContent(multiPart);
-    		
-    		//File file = new File(path);
-    		//fileMime.attachFile(file);
-    		
-    		
-    		//multiPart.addBodyPart(textMime);
-    		//multiPart.addBodyPart(fileMime);
-    		
-    		//m.setContent(multiPart);
     		//Step 3 : Send the MEssage using Transport class
     		Transport.send(m);
     		System.out.println("Sent Successfully");
     		flag = true;
-    		
-    	}
-    	catch(Exception e)
-    	{
+    	} catch(Exception e) {
     		e.printStackTrace();
     	}
-    	
+		========================================================= */
+
+		// =========================================================
+		// NEW HTTP API CODE (Bypasses Render's SMTP block)
+		// Example using SendGrid (You will need to create a free SendGrid account)
+		// =========================================================
+		try {
+			// Retrieve API Key from environment variables (fallback is empty so it won't crash locally)
+			String apiKey = System.getenv("SENDGRID_API_KEY");
+			if (apiKey == null || apiKey.isEmpty()) {
+				System.err.println("SENDGRID_API_KEY environment variable is missing!");
+				return false;
+			}
+
+			// Clean strings for JSON
+			String safeSubject = subject.replace("\"", "\\\"");
+			String safeMsg = msg.replace("\"", "\\\"");
+			String safeTo = to.replace("\"", "\\\"");
+			String safeFrom = from.replace("\"", "\\\"");
+
+			// Build SendGrid JSON payload manually
+			String jsonPayload = "{"
+					+ "\"personalizations\": [{\"to\": [{\"email\": \"" + safeTo + "\"}], \"subject\": \"" + safeSubject + "\"}],"
+					+ "\"from\": {\"email\": \"" + safeFrom + "\"},"
+					+ "\"content\": [{\"type\": \"text/html\", \"value\": \"" + safeMsg + "\"}]"
+					+ "}";
+
+			// Use Java 11+ built-in HttpClient to make the REST request on port 443
+			java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+			java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+					.uri(java.net.URI.create("https://api.sendgrid.com/v3/mail/send"))
+					.header("Authorization", "Bearer " + apiKey)
+					.header("Content-Type", "application/json")
+					.POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload))
+					.build();
+
+			java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+			if (response.statusCode() >= 200 && response.statusCode() < 300) {
+				System.out.println("Sent Successfully using SendGrid API!");
+				flag = true;
+			} else {
+				System.err.println("Failed to send email via API. Status code: " + response.statusCode());
+				System.err.println("Response: " + response.body());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return flag;
 	}
 }
